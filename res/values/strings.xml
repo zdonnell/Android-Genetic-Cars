@@ -1,0 +1,30 @@
+<resources>
+
+    <string name="app_name">Eden</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_addaccount">Add Account</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_characters">Characters</string>
+    <string name="title_corporations">Corporations</string>
+    <string name="title_activity_main_dual">Dual Layout</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_add_account">AddAccount</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_activity_main_strip">Eden</string>
+    <string name="title_sheetitem_detail">SheetItem Detail</string>
+    <string name="title_sheetitem_list">SheetItems</string>
+    <string name="title_activity_apitest">APITestActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_bar_slide">Sliding Content Only</string>
+    <string name="character_grid_activity_title">Characters</string>
+    <string name="type_info">Type Information</string>
+    <string name="api_keys">API Keys</string>
+    <string name="toggle_portrait_explanation">Tap on a portrait to toggle monitoring of that character</string>
+    <string name="show_add_api_key_info_again_message">Do not show this message again</string>
+    
+    <string name="drawer_open">Open the Drawer</string>
+    <string name="drawer_close">Close the Drawer</string>
+    
+</resources>
