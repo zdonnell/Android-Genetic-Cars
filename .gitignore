@@ -1,0 +1,7 @@
+bin/
+gen/
+target/
+.settings/
+.classpath
+.gitmodules
+.project
