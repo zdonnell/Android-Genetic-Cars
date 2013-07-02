@@ -1,35 +1,86 @@
 package com.zdonnell.geneticcars;
 
+/**
+ *
+ * @author Zach
+ */
 public class Car {
 
+    /**
+     * The genetic representation of the Car's phenotypes.
+     */
+    private boolean[] dna;
+
+    /**
+     * The number of segments in the car's body.
+     */
 	private final static int BODY_SEGMENTS = 8;
-	private final static int BODY_SEGMENT_MAXLEN = 10;
 
-	double[] bodySegmentLengths = new double[BODY_SEGMENTS];
-	double[] bodySegmentAngles = new double[BODY_SEGMENTS];
+    /**
+     * The max length of the car's body segments
+     */
+	private final static int MAX_BODY_SEGMENT_LEN = 10;
 
-	private Wheel[] wheels = new Wheel[2];
+    /**
+     * The max number of wheels a car can have
+     */
+    private final static int MAX_WHEELS = 2;
 
-	public Car() {
-		generateAttrs();
-		generateWheels();
+    /**
+     * An array the size of {@link #BODY_SEGMENTS} that stores
+     * the length of each for this car.
+     */
+	private double[] bodySegmentLengths = new double[BODY_SEGMENTS];
+
+    /**
+     * An array the size of {@link #BODY_SEGMENTS} that stores
+     * the angle of each segment. This number represents the offset from the
+     * previous angle, not the total angle.
+     */
+	private double[] bodySegmentAngles = new double[BODY_SEGMENTS];
+
+    /**
+     * The actual number of wheels for this car.
+     */
+    private int wheelCount;
+
+	private Wheel[] wheels;
+
+    private int[] wheelMountPoints;
+
+    /**
+     * Generates a car based on the provided dna, or randomly generated one if
+     * a null dna is provide.
+     *
+     * @param dna the dna to express for this car, can be null
+     */
+	public Car(boolean[] dna) {
+        if (dna == null) {
+            dna = randomGenome();
+        }
+        this.dna = dna;
+        expressGenome(dna);
 	}
 
-	/**
-	 * Generates random attributes for the car, up to the max bounds
-	 */
-	private void generateAttrs() {
-		for(int i = 0; i < BODY_SEGMENTS; ++i) {
-			bodySegmentLengths[i] = Math.random() * BODY_SEGMENT_MAXLEN;
-			bodySegmentAngles[i] = Math.random() * (180d / BODY_SEGMENTS);
-		}
-	}
+    /**
+     * Sets the cars attributes based on the specified dna
+     *
+     * @param dna
+     */
+	private void expressGenome(boolean[] dna) {
 
-	/**
-	 * Generates two wheels
-	 */
-	private void generateWheels() {
-		wheels[0] = new Wheel();
-		wheels[1] = new Wheel();
-	}
+    }
+
+    private boolean[] randomGenome() {
+        return null;
+    }
+
+    public boolean[] getDna() {
+        return dna;
+    }
+
+    public Car mateWith(Car mate) {
+        boolean[] childDna = GeneticAlgorithms.reproduce(this.getDna(), mate.getDna());
+        return new Car(childDna);
+    }
 }
