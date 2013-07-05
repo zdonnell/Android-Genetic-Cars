@@ -15,6 +15,7 @@ public class MainActivity extends AndroidApplication {
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.useAccelerometer = false;
         cfg.useCompass = false;
+		cfg.numSamples = 4;
 
         setContentView(initializeForView(new Simulation(), cfg));
     }

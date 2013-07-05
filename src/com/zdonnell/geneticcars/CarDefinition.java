@@ -111,7 +111,7 @@ public class CarDefinition {
 	 * @return the new born child
 	 */
 	public static CarDefinition geneticCrossover(CarDefinition p1, CarDefinition p2) {
-		int split = (int) Math.random() * ATTRIBUTE_COUNT;
+		int split = (int) (Math.random() * ATTRIBUTE_COUNT);
 
 		// Select body segments from parents
 		Vector2[] childBodySegs = new Vector2[8];

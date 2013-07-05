@@ -2,10 +2,10 @@ package com.zdonnell.geneticcars;
 
 public class Wheel {
 
-    private final static double WHEEL_MAX_RADIUS = 0.5;
-    private final static double WHEEL_MIN_RADIUS = 0.2;
-    private final static int WHEEL_MAX_DENSITY = 100;
-    private final static int  WHEEL_MIN_DENSITY = 40;
+	public final static double WHEEL_MAX_RADIUS = 0.5;
+	public final static double WHEEL_MIN_RADIUS = 0.2;
+	public final static int WHEEL_MAX_DENSITY = 100;
+	public final static int  WHEEL_MIN_DENSITY = 40;
 
     /**
      * How dense the wheel is (more dense means more weight for the same radius)

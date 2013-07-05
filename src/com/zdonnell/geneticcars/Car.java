@@ -1,12 +1,14 @@
 package com.zdonnell.geneticcars;
 
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
  *
  * @author Zach
  */
-public class Car {
+public class Car extends Image {
 
 	/**
 	 * The raw attributes that this car is based on
@@ -23,6 +25,10 @@ public class Car {
 	 */
 	private final Body[] wheels;
 
+	public float maxDistance = 0.0f;
+
+	public long timeLastMoved;
+
     /**
      * Creates a car from the provided definition.
      */
@@ -30,6 +36,8 @@ public class Car {
 		this.carDefinition = carDefinition;
 		this.chassis = chassis;
 		this.wheels = wheels;
+
+		timeLastMoved = System.currentTimeMillis();
     }
 
 	public CarDefinition getCarDefinition() {
@@ -42,5 +50,12 @@ public class Car {
 
 	public Body[] getWheels() {
 		return wheels;
+	}
+
+	public void removeFromWorld(World world) {
+		world.destroyBody(chassis);
+
+		for (Body wheel : wheels)
+			world.destroyBody(wheel);
 	}
 }
