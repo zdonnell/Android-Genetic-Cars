@@ -3,6 +3,7 @@ package com.zdonnell.geneticcars;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -17,7 +18,17 @@ public class MainActivity extends AndroidApplication {
         cfg.useCompass = false;
 		cfg.numSamples = 4;
 
-        setContentView(initializeForView(new Simulation(), cfg));
+        final Simulation sim = new Simulation();
+        final View simulationView = initializeForView(sim, cfg);
+
+        setContentView(simulationView);
+        simulationView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                float aspect = (float) v.getWidth() / (float) v.getHeight();
+                sim.setAspect(aspect);
+            }
+        });
     }
 
 	@Override

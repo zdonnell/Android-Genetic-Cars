@@ -48,13 +48,16 @@ public class Renderer {
 				shapeRenderer.end();
 			}
 
+
 			// draw chassis
-			for (Fixture chassisPart : car.getChassis().getFixtureList()) {
+            Vector2 v1 = new Vector2();
+            Vector2 v2 = new Vector2();
+            Vector2 v3 = new Vector2();
+
+            for (Fixture chassisPart : car.getChassis().getFixtureList()) {
 				PolygonShape chassisPieceShape = (PolygonShape) chassisPart.getShape();
-				Vector2 v1 = new Vector2();
-				Vector2 v2 = new Vector2();
-				Vector2 v3 = new Vector2();
-				chassisPieceShape.getVertex(0, v1);
+
+                chassisPieceShape.getVertex(0, v1);
 				chassisPieceShape.getVertex(1, v2);
 				chassisPieceShape.getVertex(2, v3);
 				car.getChassis().getTransform().mul(v1);
@@ -71,28 +74,37 @@ public class Renderer {
 				shapeRenderer.triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
 				shapeRenderer.end();
 			}
-		}
+        }
 	}
 
+    /**
+     * Uses the shape renderer to draw all tiles in the List
+     *
+     * @param tiles
+     */
 	public void renderTiles(List<Body> tiles) {
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 		shapeRenderer.setColor(Color.DARK_GRAY);
-		for (Body tile : tiles) {
+
+        // Setup some reusable Vector2s
+        Vector2[] verts = new Vector2[4];
+        for (int i = 0; i < verts.length; i++)
+            verts[i] = new Vector2();
+        Vector2 lv = new Vector2(), f = new Vector2();
+
+        for (Body tile : tiles) {
 			PolygonShape tileShape = (PolygonShape) tile.getFixtureList().get(0).getShape();
 
-			Vector2[] verts = new Vector2[4];
 			for (int i = 0; i < verts.length; i++) {
-				verts[i] = new Vector2();
 				tileShape.getVertex(i, verts[i]);
 				tile.getTransform().mul(verts[i]);
 			}
 
-			Vector2 lv = new Vector2(), f = new Vector2();
 			lv.set(verts[0]);
 			f.set(verts[0]);
-
 			for (int i = 1; i < verts.length; i++) {
 				Vector2 v = verts[i];
+
 				shapeRenderer.line(lv.x, lv.y, v.x, v.y);
 				lv.set(v);
 			}

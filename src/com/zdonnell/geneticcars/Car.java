@@ -1,5 +1,10 @@
 package com.zdonnell.geneticcars;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -25,6 +30,9 @@ public class Car extends Image {
 	 */
 	private final Body[] wheels;
 
+    private Mesh bodyMesh;
+
+
 	public float maxDistance = 0.0f;
 
 	public long timeLastMoved;
@@ -38,6 +46,16 @@ public class Car extends Image {
 		this.wheels = wheels;
 
 		timeLastMoved = System.currentTimeMillis();
+
+        bodyMesh = new Mesh(true, 3, 3,
+                   new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+                   new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, "a_color"));
+
+        bodyMesh.setVertices(new float[] { -0.5f, -0.5f, 0, Color.toFloatBits(255, 0, 0, 255),
+                                        0.5f, -0.5f, 0, Color.toFloatBits(0, 255, 0, 255),
+                                        0, 0.5f, 0, Color.toFloatBits(0, 0, 255, 255) });
+
+        bodyMesh.setIndices(new short[] { 0, 1, 2 });
     }
 
 	public CarDefinition getCarDefinition() {
@@ -58,4 +76,8 @@ public class Car extends Image {
 		for (Body wheel : wheels)
 			world.destroyBody(wheel);
 	}
+
+    public void render() {
+        bodyMesh.render(GL10.GL_TRIANGLES);
+    }
 }

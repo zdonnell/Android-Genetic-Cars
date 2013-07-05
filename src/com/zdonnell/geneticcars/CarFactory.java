@@ -28,7 +28,7 @@ public class CarFactory {
 	public static Car buildCar(CarDefinition definition, World world) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		bodyDef.position.set(0.0f, 2f);
+		bodyDef.position.set(0.0f, 4f);
 
 		Body body = world.createBody(bodyDef);
 
@@ -36,7 +36,6 @@ public class CarFactory {
 		for (int i = 0; i < vertexes.length; i++) {
 			attachChassisPiece(body, vertexes[i], vertexes[(i + 1) % vertexes.length]);
 		}
-
 		Body[] wheelBodies = new Body[2];
 		wheelBodies[0] = buildWheel(world, definition.getWheels()[0]);
 		wheelBodies[1] = buildWheel(world, definition.getWheels()[1]);
@@ -46,7 +45,7 @@ public class CarFactory {
 		return new Car(definition, body, wheelBodies);
 	}
 
-	/**
+    /**
 	 * Builds a chassis piece for a car.  Due to how box2d works, we are
 	 * basically creating a series of triangles for the car.  Each chassis piece
 	 * created here is one triangle on the car body.
