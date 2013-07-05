@@ -28,7 +28,7 @@ public class CarFactory {
 	public static Car buildCar(CarDefinition definition, World world) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		bodyDef.position.set(0.0f, 0.4f);
+		bodyDef.position.set(0.0f, 2f);
 
 		Body body = world.createBody(bodyDef);
 
@@ -123,8 +123,7 @@ public class CarFactory {
 			jointDef.localAnchorA.set(vertex.x, vertex.y);
 			jointDef.localAnchorB.set(0, 0);
 
-			float torque = (float) (totalMass * -world.getGravity().y / wheelDefs[i].getRadius());
-			jointDef.maxMotorTorque = torque;
+			jointDef.maxMotorTorque = (float) (totalMass * -world.getGravity().y / wheelDefs[i].getRadius());
 			jointDef.motorSpeed = -MOTOR_SPEED;
 			jointDef.enableMotor = true;
 			jointDef.bodyA = chassis;
