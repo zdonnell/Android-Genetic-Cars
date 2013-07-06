@@ -9,6 +9,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
+import java.util.Arrays;
+
 /**
  * Created by zach on 7/3/13.
  */
@@ -20,15 +22,15 @@ public class CarFactory {
 	 * Given a provided CarDefinition, this function builds a fully
 	 * assembled Car, and places it in the physics world.
 	 *
-	 * @param definition
-	 * @param world
+	 * @param definition the Definition to build the car from
+	 * @param world the world to build the car in
 	 * @return a Car reference containing the physics body and the used
 	 * car definition
 	 */
-	public static Car buildCar(CarDefinition definition, World world) {
+	public static Car buildCar(CarDefinition definition, World world, boolean isElite) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		bodyDef.position.set(0.0f, 4f);
+		bodyDef.position.set(0.0f, 0.5f);
 
 		Body body = world.createBody(bodyDef);
 
@@ -42,7 +44,30 @@ public class CarFactory {
 
 		attachWheels(world, body, vertexes, wheelBodies, definition.getWheels());
 
-		return new Car(definition, body, wheelBodies);
+		return new Car(definition, body, wheelBodies, isElite);
+	}
+
+	public static Car buildClone(Car elite, World world) {
+		Vector2[] bodySegCopy = Arrays.copyOfRange(elite.getCarDefinition().getBodySegments(), 0, 8);
+		Wheel[] wheelsCopy = Arrays.copyOfRange(elite.getCarDefinition().getWheels(), 0, 2);
+
+		return buildCar(new CarDefinition(bodySegCopy, wheelsCopy), world, true);
+	}
+
+	/**
+	 * Makes a baby car by combining the "dna" of the two parent cars and then performing a
+	 * chance based mutation.
+	 *
+	 * @param parent1 the first Parent
+	 * @param parent2 the Second Parent
+	 * @param world the world to bring this baby into
+	 * @return The built car.
+	 */
+	public static Car buildBabyCar(Car parent1, Car parent2, World world) {
+		CarDefinition babyDefinition = CarDefinition.geneticCrossover(parent1.getCarDefinition(), parent2.getCarDefinition());
+		babyDefinition.mutate(0.05f);
+
+		return buildCar(babyDefinition, world, false);
 	}
 
     /**
@@ -66,7 +91,7 @@ public class CarFactory {
 		fixDef.shape = pieceShape;
 		fixDef.density = 80;
 		fixDef.friction = 10;
-		fixDef.restitution = 0.2f;
+		fixDef.restitution = 0f;
 		fixDef.filter.groupIndex = -1;
 
 		body.createFixture(fixDef);
@@ -91,7 +116,7 @@ public class CarFactory {
 		fixDef.shape = circleShape;
 		fixDef.density = (float) wheel.getDensity();
 		fixDef.friction = 1;
-		fixDef.restitution = 0.2f;
+		fixDef.restitution = 0f;
 		fixDef.filter.groupIndex = -1;
 
 		wheelBody.createFixture(fixDef);

@@ -117,22 +117,18 @@ public class CarDefinition {
 		Vector2[] childBodySegs = new Vector2[8];
 		int segNum = 0;
 		for (;segNum < 8; segNum++) {
-			childBodySegs[segNum] = (segNum < split) ? p1.getBodySegments()[segNum].cpy()
-					: p2.getBodySegments()[segNum].cpy();
+			childBodySegs[segNum] = new Vector2();
+			childBodySegs[segNum].set(p1.getBodySegments()[segNum].cpy());
 		}
 
+		// Select wheel attributes from parents
 		Wheel[] wheels = new Wheel[2];
-		// Base wheel 1 from parents
-		double w1Den = (segNum + 1 < split) ? p1.wheels[0].getDensity() : p2.wheels[0].getDensity();
-		double w1Rad = (segNum + 2 < split) ? p1.wheels[0].getRadius() : p2.wheels[0].getRadius();
-		int w1Vert = (segNum + 3 < split) ? p1.wheels[0].getVertex() : p2.wheels[0].getVertex();
-		wheels[0] = new Wheel(w1Den, w1Rad, w1Vert);
-
-		// Base wheel 2 from parents
-		double w2Den = (segNum + 1 < split) ? p1.wheels[1].getDensity() : p2.wheels[1].getDensity();
-		double w2Rad = (segNum + 2 < split) ? p1.wheels[1].getRadius() : p2.wheels[1].getRadius();
-		int w2Vert = (segNum + 3 < split) ? p1.wheels[1].getVertex() : p2.wheels[1].getVertex();
-		wheels[1] = new Wheel(w2Den, w2Rad, w2Vert);
+		for (int i = 0; i < wheels.length; i++) {
+			double w1Den = (segNum + (i * 3 + 1) < split) ? p1.wheels[i].getDensity() : p2.wheels[i].getDensity();
+			double w1Rad = (segNum + (i * 3 + 2) < split) ? p1.wheels[i].getRadius() : p2.wheels[i].getRadius();
+			int w1Vert = (segNum + (i * 3 + 3) < split) ? p1.wheels[i].getVertex() : p2.wheels[i].getVertex();
+			wheels[i] = new Wheel(w1Den, w1Rad, w1Vert);
+		}
 
 		return new CarDefinition(childBodySegs, wheels);
 	}
@@ -149,13 +145,23 @@ public class CarDefinition {
 	 */
 	public void mutate(float mutateFactor) {
 		// check for body/chassis mutations
-		for (int j = 0; j < 8; j++) {
-			if (Math.random() < mutateFactor) {
-				float randx = (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS;
-				float randy = (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS;
-				bodySegments[j] = new Vector2(randx, randy);
-			}
-		}
+		if (Math.random() < mutateFactor)
+			bodySegments[0] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, 0f);
+		if (Math.random() < mutateFactor)
+			bodySegments[1] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS);
+		if (Math.random() < mutateFactor)
+			bodySegments[2] = new Vector2(0f, (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS);
+		if (Math.random() < mutateFactor)
+			bodySegments[3] = new Vector2((float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS, (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS);
+		if (Math.random() < mutateFactor)
+			bodySegments[4] = new Vector2((float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS, 0f);
+		if (Math.random() < mutateFactor)
+			bodySegments[5] = new Vector2((float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
+		if (Math.random() < mutateFactor)
+			bodySegments[6] = new Vector2(0f, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
+		if (Math.random() < mutateFactor)
+			bodySegments[7] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
+
 		// check for wheel mutations
 		for (int i = 0; i < 2; i++) {
 			wheels[i].mutate(mutateFactor);

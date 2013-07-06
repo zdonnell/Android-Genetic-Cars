@@ -65,12 +65,12 @@ public class Renderer {
 				car.getChassis().getTransform().mul(v3);
 
 				shapeRenderer.begin(ShapeRenderer.ShapeType.FilledTriangle);
-				shapeRenderer.setColor(0.9f, 0.6f, 0.6f, 1f - alpha);
+				shapeRenderer.setColor(car.isElite? 0.6f : 0.9f, 0.6f, car.isElite? 0.9f : 0.6f, 1f - alpha);
 				shapeRenderer.filledTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
 				shapeRenderer.end();
 
 				shapeRenderer.begin(ShapeRenderer.ShapeType.Triangle);
-				shapeRenderer.setColor(0.9f, 0.1f, 0.1f, 1f - alpha);
+				shapeRenderer.setColor(car.isElite? 0.1f : 0.9f, 0.1f, car.isElite? 0.9f : 0.1f, 1f - alpha);
 				shapeRenderer.triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
 				shapeRenderer.end();
 			}
