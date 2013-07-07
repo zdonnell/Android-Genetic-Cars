@@ -91,20 +91,29 @@ public class TerrainGenerator {
 	 * Rotates a set of vertices of a horizontal tile by the angle specified around
 	 * the center (0, 0) coordinate.
 	 *
-	 * @param vertices the set of vertices that make up a tile
-	 * @param angle    the angle to rotate the tile vertices by
+	 * @param v the set of vertices that make up a tile
+	 * @param a the angle to rotate the tile vertices by (in radians)
 	 * @return an array of the rotated vertices
 	 */
-	private static Vector2[] rotateTileVertices(Vector2[] vertices, double angle) {
-		Vector2 center = new Vector2(0, 0);
-		Vector2[] rotatedVertices = new Vector2[vertices.length];
+	private static Vector2[] rotateTileVertices(Vector2[] v, double a) {
+		Vector2 c = new Vector2(0, 0);
+		Vector2[] rotatedVertices = new Vector2[v.length];
 
 		// Calculate the new point for each vertex based on a rotation around (0, 0)
-		for (int i = 0; i < vertices.length; i++) {
+		for (int i = 0; i < v.length; i++) {
 			Vector2 rotatedVertex = new Vector2();
-			rotatedVertex.x = (float) (Math.cos(angle) * (vertices[i].x - center.x) - Math.sin(angle) * (vertices[i].y - center.y) + center.x);
-			rotatedVertex.y = (float) (Math.sin(angle) * (vertices[i].x - center.x) - Math.cos(angle) * (vertices[i].y - center.y) + center.y);
+			rotatedVertex.x = (float) ((Math.cos(a) * (v[i].x - c.x) - Math.sin(a) * (v[i].y - c.y) + c.x));
+			rotatedVertex.y = (float) ((Math.sin(a) * (v[i].x - c.x) - Math.cos(a) * (v[i].y - c.y) + c.y));
 			rotatedVertices[i] = rotatedVertex;
+		}
+		// If the rotation angle is greater than 45 degrees, the tile polygon becomes "inside out."  Box2d
+		// doesn't like this, so we need to reverse the direction of the vertices.
+		// TODO: Figure out if something is wrong with the rotation algorithm
+		if (Math.abs(a) > 0.785398163) {
+			Vector2 temp = rotatedVertices[3];
+			rotatedVertices[3] = rotatedVertices[2];
+			rotatedVertices[2] = rotatedVertices[1];
+			rotatedVertices[1] = temp;
 		}
 		return rotatedVertices;
 	}
