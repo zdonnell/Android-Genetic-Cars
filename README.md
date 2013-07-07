@@ -4,6 +4,8 @@ This is essentially a port of [HTML5 Genetic Cars](https://github.com/red42/HTML
 
 If you notice anything wrong/buggy please let me know! As it stands now I have tested on an HTC One X and a Nexus 7, it seems to do OK. However, as with the original, (maybe even more so) there are deterministic issues.  Any given car may not peform the same as it did previously.
 
+![Nexus 7 Screenshot of Android Genetic Cars](http://i.imgur.com/3735TGM.png)
+
 License
 -----------
 > Copyright (c) 2013 Zach Donnell
