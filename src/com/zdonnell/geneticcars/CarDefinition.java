@@ -133,7 +133,7 @@ public class CarDefinition {
 		int segNum = 0;
 		for (; segNum < 8; segNum++) {
 			childBodySegs[segNum] = new Vector2();
-			childBodySegs[segNum].set(p1.getBodySegments()[segNum].cpy());
+			childBodySegs[segNum].set(segNum < split ? p1.getBodySegments()[segNum] : p2.getBodySegments()[segNum]);
 		}
 
 		// Select wheel attributes from parents
