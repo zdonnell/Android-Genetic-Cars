@@ -3,55 +3,70 @@ package com.zdonnell.geneticcars;
 import com.badlogic.gdx.math.Vector2;
 
 /**
+ * This class is used to store a raw description of any given cars attributes.  Consider it the
+ * blueprint or DNA used to build cars from.
  *
  * @author Zach
  */
 public class CarDefinition {
 
-	private final static int  ATTRIBUTE_COUNT = 14;
+	/**
+	 * This is the total number of unique attributes a car has that can be mutated.
+	 *
+	 * @see #mutate(float)
+	 * @see #geneticCrossover(CarDefinition, CarDefinition)
+	 */
+	private final static int ATTRIBUTE_COUNT = 14;
 
+	/**
+	 * The max length that one of the body segments (lines) can be
+	 */
 	private final static float CHASSIS_MAX_AXIS = 1.1f;
-    private final static float CHASSIS_MIN_AXIS = 0.1f;
 
-    /**
-     * Represents the raw values for the chassis bounds.
-     */
-    private Vector2[] bodySegments;
+	/**
+	 * The min length that one of the body segments (lines) can be
+	 */
+	private final static float CHASSIS_MIN_AXIS = 0.1f;
 
-    /**
-     * Represents the raw values for the wheel definitions.
-     */
-    private Wheel[] wheels;
+	/**
+	 * Represents the raw values for the chassis bounds.
+	 */
+	private Vector2[] bodySegments;
 
-    /**
-     * Creates a car with random attributes.
-     */
-    public CarDefinition() {
-        generateRandomAttributes();
-    }
+	/**
+	 * Represents the raw values for the wheel definitions.
+	 */
+	private Wheel[] wheels;
 
-    /**
-     * Creates a new car based on the provided raw data
-     *
-     * @param bodySegments
-     * @param wheels
-     */
-    public CarDefinition(Vector2[] bodySegments, Wheel[] wheels) {
-        this.bodySegments = bodySegments;
-        this.wheels = wheels;
-    }
+	/**
+	 * Creates a car with random attributes.
+	 */
+	public CarDefinition() {
+		generateRandomAttributes();
+	}
 
-    /**
-     * Generates random attributes for the car's chassis
-     * and it's wheels.
-     */
-    private void generateRandomAttributes() {
-        // Create 2 random wheels
-        wheels = new Wheel[2];
-        for (int i = 0; i < 2; i++) {
-            wheels[i] = new Wheel();
-        }
-        // Create 8 random body segments
+	/**
+	 * Creates a new car based on the provided raw data
+	 *
+	 * @param bodySegments
+	 * @param wheels
+	 */
+	public CarDefinition(Vector2[] bodySegments, Wheel[] wheels) {
+		this.bodySegments = bodySegments;
+		this.wheels = wheels;
+	}
+
+	/**
+	 * Generates random attributes for the car's chassis
+	 * and it's wheels.
+	 */
+	private void generateRandomAttributes() {
+		// Create 2 random wheels
+		wheels = new Wheel[2];
+		for (int i = 0; i < 2; i++) {
+			wheels[i] = new Wheel();
+		}
+		// Create 8 random body segments
 		bodySegments = new Vector2[8];
 		bodySegments[0] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, 0f);
 		bodySegments[1] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, (float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS);
@@ -61,14 +76,14 @@ public class CarDefinition {
 		bodySegments[5] = new Vector2((float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
 		bodySegments[6] = new Vector2(0f, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
 		bodySegments[7] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, (float) -Math.random() * CHASSIS_MAX_AXIS - CHASSIS_MIN_AXIS);
-    }
+	}
 
-    /**
-     * Returns the raw values for the chassis bounds.
-     */
-    public Vector2[] getBodySegments() {
-        return bodySegments;
-    }
+	/**
+	 * Returns the raw values for the chassis bounds.
+	 */
+	public Vector2[] getBodySegments() {
+		return bodySegments;
+	}
 
 	/**
 	 * Returns the raw values for the wheels
@@ -80,30 +95,30 @@ public class CarDefinition {
 	/**
 	 * Mimics genetic chromosome crossover found in
 	 * sexual reproduction.<br><br>
-	 *
+	 * <p/>
 	 * This method picks a point in the figurative list of
 	 * attributes to alternate which parent attributes it uses for the
 	 * child.<br><br>
-	 *
+	 * <p/>
 	 * For example, if the crossover point is 8 all attributes before 8 will
 	 * be pulled from parent one, the remainder will be pulled from parent two.<br><br>
-	 *
+	 * <p/>
 	 * For our case the attributes look like this
 	 * <ol>
-	 *     <li>Body Segment 1 (Vector2)</li>
-	 *     <li>Body Segment 2 (Vector2)</li>
-	 *     <li>Body Segment 3 (Vector2)</li>
-	 *     <li>Body Segment 4 (Vector2)</li>
-	 *     <li>Body Segment 5 (Vector2)</li>
-	 *     <li>Body Segment 6 (Vector2)</li>
-	 *     <li>Body Segment 7 (Vector2)</li>
-	 *     <li>Body Segment 8 (Vector2)</li>
-	 *     <li>Wheel 1 Density</li>
-	 *     <li>Wheel 1 Radius</li>
-	 *     <li>Wheel 1 Vertex</li>
-	 *     <li>Wheel 2 Density</li>
-	 *     <li>Wheel 2 Radius</li>
-	 *     <li>Wheel 2 Vertex</li>
+	 * <li>Body Segment 1 (Vector2)</li>
+	 * <li>Body Segment 2 (Vector2)</li>
+	 * <li>Body Segment 3 (Vector2)</li>
+	 * <li>Body Segment 4 (Vector2)</li>
+	 * <li>Body Segment 5 (Vector2)</li>
+	 * <li>Body Segment 6 (Vector2)</li>
+	 * <li>Body Segment 7 (Vector2)</li>
+	 * <li>Body Segment 8 (Vector2)</li>
+	 * <li>Wheel 1 Density</li>
+	 * <li>Wheel 1 Radius</li>
+	 * <li>Wheel 1 Vertex</li>
+	 * <li>Wheel 2 Density</li>
+	 * <li>Wheel 2 Radius</li>
+	 * <li>Wheel 2 Vertex</li>
 	 * </ol>
 	 *
 	 * @param p1 the first parent used in reproduction
@@ -116,7 +131,7 @@ public class CarDefinition {
 		// Select body segments from parents
 		Vector2[] childBodySegs = new Vector2[8];
 		int segNum = 0;
-		for (;segNum < 8; segNum++) {
+		for (; segNum < 8; segNum++) {
 			childBodySegs[segNum] = new Vector2();
 			childBodySegs[segNum].set(p1.getBodySegments()[segNum].cpy());
 		}
@@ -137,7 +152,7 @@ public class CarDefinition {
 	 * This applies mutations to each attribute (for the sake of this
 	 * program, a mutation is a new random value for that attribute) with a probability
 	 * of that provided.<br><br>
-	 *
+	 * <p/>
 	 * For example, providing a mutation factor of 0.05 (5%) would give each
 	 * attribute a 5% chance of being randomized.
 	 *
@@ -145,6 +160,7 @@ public class CarDefinition {
 	 */
 	public void mutate(float mutateFactor) {
 		// check for body/chassis mutations
+		// These have to be done individually to insure that body segments point the right general direction.
 		if (Math.random() < mutateFactor)
 			bodySegments[0] = new Vector2((float) Math.random() * CHASSIS_MAX_AXIS + CHASSIS_MIN_AXIS, 0f);
 		if (Math.random() < mutateFactor)

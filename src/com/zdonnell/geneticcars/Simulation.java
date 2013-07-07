@@ -20,51 +20,113 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * This is the main class maintaining the state of the simulation.  It primarily keeps track of
+ * global simulation details, such as the number of currently existing cars, and what generation
+ * we are on.
+ *
+ * @author Zach
+ */
 public class Simulation implements ApplicationListener {
 
+	/**
+	 * The number of cars to be spawned at the beginning of each generation
+	 */
 	private static final int GENERATION_SIZE = 10;
 
-	public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
-
+	/**
+	 * The libgdx camera to render the cars/terrain to
+	 */
 	OrthographicCamera camera;
 
+	/**
+	 * Reference to the custom rendering class that handles drawing of the simulation
+	 * elements
+	 */
 	private Renderer renderer;
 
+	/**
+	 * The box2d World.  This is the "world" that the actual physics simulation is done in.
+	 */
 	protected World world;
 
-	private List<Body> terrainTiles = new ArrayList<Body>();
-
-	private List<Car> activeCars = new ArrayList<Car>(GENERATION_SIZE);
-
-	private List<Car> genCars = new ArrayList<Car>(GENERATION_SIZE);
-
-	private List<Car> deadCars = new ArrayList<Car>(GENERATION_SIZE);
-
-    private float aspect = 0.5f;
-
-	private View view;
-
-	private int screenWidth, screenHeight;
-
-	private int generation = 0;
-
+	/**
+	 * The font class used to draw text to the screen
+	 */
 	private BitmapFont font;
+
+	/**
+	 * SpriteBatch used with {@link #font} to render text
+	 */
 	private SpriteBatch spriteBatch;
 
-    public void setParentView(View simulationView) {
-		this.view = simulationView;
-    }
+	/**
+	 * The list of all terrain tiles (box2d physics bodies)
+	 */
+	private List<Body> terrainTiles = new ArrayList<Body>();
 
-    @Override
-    public void create() {
-		screenWidth = view.getMeasuredWidth();
+	/**
+	 * The list of cars still alive in the current generation
+	 */
+	private List<Car> activeCars = new ArrayList<Car>(GENERATION_SIZE);
+
+	/**
+	 * All the cars from the current generation DEAD OR ALIVE
+	 */
+	private List<Car> genCars = new ArrayList<Car>(GENERATION_SIZE);
+
+	/**
+	 * A reference to the view containing this simulation.  This is currently
+	 * needed to determine the size of the area (in pixels) used to
+	 * display the simulation
+	 */
+	private View view;
+
+	/**
+	 * The max distance any car has traveled
+	 */
+	private double maxDistance = 0;
+
+	/**
+	 * The generation that {@link #maxDistance} was set during
+	 */
+	private int maxDistanceGeneration = 0;
+
+	/**
+	 * The height of the screen in pixels, this is only needed
+	 * so we can render the gui text at different points on the screen.
+	 */
+	private int screenHeight;
+
+	/**
+	 * The current generation number
+	 */
+	private int generation = 0;
+
+	/**
+	 * Set this so the simulation can figure out it's size in pixels when it
+	 * tries in {@link #create()}  This is important, we need it to figure out how
+	 * to scale the camera frame, so it's 1:1 with the view frame.
+	 *
+	 * TODO: Figure out if there is a better way to do this.
+	 *
+	 * @param simulationView the view that contains the simulation
+	 */
+	public void setParentView(View simulationView) {
+		this.view = simulationView;
+	}
+
+	@Override
+	public void create() {
+		// Get the containing views size
+		// The measured width/height should be set by the time this method is called
+		int screenWidth = view.getMeasuredWidth();
 		screenHeight = view.getMeasuredHeight();
 		view = null;
-		aspect = (float) screenHeight / (float) screenWidth;
 
-        // create the camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 12, 12 * aspect);
+		// create the camera
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 12, 12 * (float) screenHeight / (float) screenWidth);
 		camera.position.set(0, 0, 0);
 
 		font = new BitmapFont(Gdx.files.internal("khmer.fnt"), Gdx.files.internal("khmer.png"), false);
@@ -82,13 +144,12 @@ public class Simulation implements ApplicationListener {
 
 		// Create initial car generation
 		createGeneration();
-    }
+	}
 
-    @Override
-    public void render() {
-
+	@Override
+	public void render() {
 		// Step the physics simulation forward
-        world.step(Gdx.app.getGraphics().getDeltaTime(), 20, 20);
+		world.step(Gdx.app.getGraphics().getDeltaTime(), 20, 20);
 
 		// Reset gl frame stuff
 		Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -118,36 +179,18 @@ public class Simulation implements ApplicationListener {
 		renderer.renderCars(activeCars);
 		renderer.renderTiles(terrainTiles);
 
+		// Draw car list
 		spriteBatch.begin();
 		for (Car car : activeCars) {
 			String xPos = String.format("%4.2f", car.getChassis().getPosition().x);
 			font.draw(spriteBatch, "Car# " + genCars.indexOf(car) + ": " + xPos + (car.isElite ? "*" : ""), 10, screenHeight - 10 - 27 * activeCars.indexOf(car));
 		}
+
+		// Draw the current gen / max distance info
+		font.draw(spriteBatch, "Generation: " + generation, 10, 64);
+		if (generation != 0)
+			font.draw(spriteBatch, "Max Distance: " + String.format("%4.2f", maxDistance) + "(gen " + maxDistanceGeneration + ")", 10, 37);
 		spriteBatch.end();
-	}
-
-	/**
-	 * Resets the current simulation with a fresh terrain and set of cars.
-	 */
-	public void reset() {
-		// Clear out all the cars we are keeping track of
-		for (Car car : activeCars)
-			car.removeFromWorld(world);
-		activeCars.clear();
-		deadCars.clear();
-		genCars.clear();
-
-		// Remove the old terrain
-		for (Body tile : terrainTiles) {
-			world.destroyBody(tile);
-		}
-		terrainTiles.clear();
-
-		// Generate new terrain
-		TerrainGenerator.generate(world);
-
-		// Spawn initial population
-		createGeneration();
 	}
 
 	/**
@@ -167,25 +210,33 @@ public class Simulation implements ApplicationListener {
 				if (System.currentTimeMillis() - car.timeLastMoved > 5000) {
 					iter.remove();
 					car.removeFromWorld(world);
-                    deadCars.add(car);
 				}
 			}
 		}
 	}
 
 	/**
+	 * This populates the simulation with a new generation.  The top car from the last
+	 * generation will be placed in this generation automatically as an "elite" (blue car).<br><br>
 	 *
+	 * The remainder of the generation ({@link #GENERATION_SIZE} - 1) will be populated by
+	 * "mating" the rest of the last generation, the parents will be chosen with an emphasis on
+	 * how well they performed.
 	 */
 	private void nextGeneration() {
-		genCars.clear();
-
 		// Sort the cars by how far they made it
-		Collections.sort(deadCars, new CarDistanceSort());
-		
+		Collections.sort(genCars, new CarDistanceSort());
+
+		// Update the top score if necessary
+		if (genCars.get(0).maxDistance > maxDistance) {
+			maxDistance = genCars.get(0).maxDistance;
+			maxDistanceGeneration = generation;
+		}
+
 		// Make a clone of the top car
-		Car elite = CarFactory.buildClone(deadCars.get(0), world);
+		Car elite = CarFactory.buildClone(genCars.get(0), world);
 		activeCars.add(elite);
-		
+
 		// make babies!
 		for (int i = 0; i < GENERATION_SIZE - 1; i++) {
 			Car p1 = getParent();
@@ -197,23 +248,23 @@ public class Simulation implements ApplicationListener {
 			activeCars.add(baby);
 		}
 		// Add the new cars to the list of all cars for the generation
+		genCars.clear();
 		genCars.addAll(activeCars);
 
-		deadCars.clear();
 		generation++;
 	}
 
 	/**
-	 * Gets a Car from the previous generation, with a preference on
+	 * Gets a Car from the previous generation, with a preference for
 	 * "high performing" cars.
-	 * 
+	 *
 	 * @return a Car from the previous generation
 	 */
 	private Car getParent() {
 		double r = Math.random();
 		if (r == 0)
-			return deadCars.get(0);
-		return deadCars.get((int) (-Math.log(r) * GENERATION_SIZE) % GENERATION_SIZE);
+			return genCars.get(0);
+		return genCars.get((int) (-Math.log(r) * GENERATION_SIZE) % GENERATION_SIZE);
 	}
 
 	/**
