@@ -1,9 +1,13 @@
 package com.zdonnell.geneticcars;
 
+import android.view.View;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -20,7 +24,9 @@ public class Simulation implements ApplicationListener {
 
 	private static final int GENERATION_SIZE = 10;
 
-    OrthographicCamera camera;
+	public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
+
+	OrthographicCamera camera;
 
 	private Renderer renderer;
 
@@ -30,25 +36,39 @@ public class Simulation implements ApplicationListener {
 
 	private List<Car> activeCars = new ArrayList<Car>(GENERATION_SIZE);
 
-    private List<Car> deadCars = new ArrayList<Car>(GENERATION_SIZE);
+	private List<Car> genCars = new ArrayList<Car>(GENERATION_SIZE);
+
+	private List<Car> deadCars = new ArrayList<Car>(GENERATION_SIZE);
 
     private float aspect = 0.5f;
 
+	private View view;
+
+	private int screenWidth, screenHeight;
+
 	private int generation = 0;
 
-    public void setAspect(float aspect) {
-        if (camera != null)
-            camera.setToOrtho(false, 12, 12 * aspect);
+	private BitmapFont font;
+	private SpriteBatch spriteBatch;
 
-        this.aspect = aspect;
+    public void setParentView(View simulationView) {
+		this.view = simulationView;
     }
 
     @Override
     public void create() {
+		screenWidth = view.getMeasuredWidth();
+		screenHeight = view.getMeasuredHeight();
+		view = null;
+		aspect = (float) screenHeight / (float) screenWidth;
+
         // create the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 12, 12 * aspect);
 		camera.position.set(0, 0, 0);
+
+		font = new BitmapFont(Gdx.files.internal("khmer.fnt"), Gdx.files.internal("khmer.png"), false);
+		spriteBatch = new SpriteBatch();
 
 		// create the world
 		world = new World(new Vector2(0, -9.8f), true);
@@ -66,6 +86,7 @@ public class Simulation implements ApplicationListener {
 
     @Override
     public void render() {
+
 		// Step the physics simulation forward
         world.step(Gdx.app.getGraphics().getDeltaTime(), 20, 20);
 
@@ -96,6 +117,37 @@ public class Simulation implements ApplicationListener {
 		renderer.setProjectionMatrix(camera.combined);
 		renderer.renderCars(activeCars);
 		renderer.renderTiles(terrainTiles);
+
+		spriteBatch.begin();
+		for (Car car : activeCars) {
+			String xPos = String.format("%4.2f", car.getChassis().getPosition().x);
+			font.draw(spriteBatch, "Car# " + genCars.indexOf(car) + ": " + xPos + (car.isElite ? "*" : ""), 10, screenHeight - 10 - 27 * activeCars.indexOf(car));
+		}
+		spriteBatch.end();
+	}
+
+	/**
+	 * Resets the current simulation with a fresh terrain and set of cars.
+	 */
+	public void reset() {
+		// Clear out all the cars we are keeping track of
+		for (Car car : activeCars)
+			car.removeFromWorld(world);
+		activeCars.clear();
+		deadCars.clear();
+		genCars.clear();
+
+		// Remove the old terrain
+		for (Body tile : terrainTiles) {
+			world.destroyBody(tile);
+		}
+		terrainTiles.clear();
+
+		// Generate new terrain
+		TerrainGenerator.generate(world);
+
+		// Spawn initial population
+		createGeneration();
 	}
 
 	/**
@@ -125,6 +177,8 @@ public class Simulation implements ApplicationListener {
 	 *
 	 */
 	private void nextGeneration() {
+		genCars.clear();
+
 		// Sort the cars by how far they made it
 		Collections.sort(deadCars, new CarDistanceSort());
 		
@@ -142,6 +196,8 @@ public class Simulation implements ApplicationListener {
 			Car baby = CarFactory.buildBabyCar(p1, p2, world);
 			activeCars.add(baby);
 		}
+		// Add the new cars to the list of all cars for the generation
+		genCars.addAll(activeCars);
 
 		deadCars.clear();
 		generation++;
@@ -168,6 +224,7 @@ public class Simulation implements ApplicationListener {
 			Car newCar = CarFactory.buildCar(new CarDefinition(), world, false);
 			activeCars.add(newCar);
 		}
+		genCars.addAll(activeCars);
 	}
 
 	/**
