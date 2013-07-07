@@ -8,3 +8,5 @@ target/
 .idea/
 .geneticcars.iml
 *.iml
+project.properties
+lint.xml
